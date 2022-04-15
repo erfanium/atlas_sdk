@@ -1,6 +1,6 @@
 # Atlas SDK
 
-> **atlas_sdk** is a TypeSafe **MongoDB Atlas Data API** SDK for Deno & Deno Deploy
+> **atlas_sdk** is a TypeSafe [MongoDB Atlas Data API](https://www.mongodb.com/docs/atlas/api/data-api/#introduction) SDK for Deno & Deno Deploy
 
 [![Discord server](https://img.shields.io/discord/768918486575480863?color=blue&label=Ask%20for%20help%20here&logo=discord&style=flat-square)](https://discord.gg/HEdTCvZUSf)
 
@@ -24,9 +24,9 @@ import {
 
 ```ts
 const client = new MongoClient({
-   appId: "YOUR_APP_ID",
-   dataSource: "YOUR_CLUSTER_NAME",
-   apiKey: "YOUR_API_KEY",
+  appId: "YOUR_APP_ID", // e.g. "data-omosm"
+  dataSource: "YOUR_CLUSTER_NAME", // e.g. "Cluster0"
+  apiKey: "YOUR_API_KEY",
 });
 ```
 
