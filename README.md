@@ -1,23 +1,23 @@
-# Atlas
+# Atlas SDK
 
-> **atlas** is a TypeSafe **MongoDB Atlas Data API** SDK for Deno & Deno Deploy
+> **atlas_sdk** is a TypeSafe **MongoDB Atlas Data API** SDK for Deno & Deno Deploy
 
 [![Discord server](https://img.shields.io/discord/768918486575480863?color=blue&label=Ask%20for%20help%20here&logo=discord&style=flat-square)](https://discord.gg/HEdTCvZUSf)
 
 ## Links
 
-- [Docs](https://doc.deno.land/https/deno.land/x/atlas/mod.ts)
+- [Docs](https://doc.deno.land/https/deno.land/x/atlas_sdk/mod.ts)
 
 ### Import
 
 Replace `LATEST_VERSION` with
-[current latest version](https://deno.land/x/atlas)
+[current latest version](https://deno.land/x/atlas_sdk)
 
 ```ts
 import {
   Bson,
   MongoClient,
-} from "https://deno.land/x/atlas@LATEST_VERSION/mod.ts";
+} from "https://deno.land/x/atlas_sdk@LATEST_VERSION/mod.ts";
 ```
 
 ### Connect
