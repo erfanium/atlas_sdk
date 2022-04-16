@@ -1,1 +1,1 @@
-export * as Bson from "https://esm.sh/bson@4.6.2";
+export * as Bson from "https://deno.land/x/web_bson@v0.2.0/mod.ts";
