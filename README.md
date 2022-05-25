@@ -1,6 +1,8 @@
 # Atlas SDK
 
-> **atlas_sdk** is a TypeSafe [MongoDB Atlas Data API](https://www.mongodb.com/docs/atlas/api/data-api/#introduction) SDK for Deno & Deno Deploy
+> **atlas_sdk** is a TypeSafe
+> [MongoDB Atlas Data API](https://www.mongodb.com/docs/atlas/api/data-api/#introduction)
+> SDK for Deno & Deno Deploy
 
 [![Discord server](https://img.shields.io/discord/768918486575480863?color=blue&label=Ask%20for%20help%20here&logo=discord&style=flat-square)](https://discord.gg/HEdTCvZUSf)
 
@@ -15,8 +17,8 @@ Replace `LATEST_VERSION` with
 
 ```ts
 import {
-  Bson,
   MongoClient,
+  ObjectId,
 } from "https://deno.land/x/atlas_sdk@LATEST_VERSION/mod.ts";
 ```
 
@@ -35,7 +37,7 @@ const client = new MongoClient({
 ```ts
 // Defining schema interface
 interface UserSchema {
-  _id: ObjectId | string;
+  _id: ObjectId;
   username: string;
   password: string;
 }

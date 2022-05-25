@@ -1,7 +1,7 @@
 // deno-lint-ignore-file require-await
-import { Bson, MongoClient } from "./mod.ts";
-import { deferred } from "https://deno.land/std@0.135.0/async/deferred.ts";
-import { assertEquals } from "https://deno.land/std@0.135.0/testing/asserts.ts";
+import { MongoClient, ObjectId } from "./mod.ts";
+import { deferred } from "https://deno.land/std@0.140.0/async/deferred.ts";
+import { assertEquals } from "https://deno.land/std@0.140.0/testing/asserts.ts";
 
 Deno.test("Sample Test", async () => {
   const fetchMock = deferred<{ url: string; init: RequestInit }>();
@@ -14,12 +14,12 @@ Deno.test("Sample Test", async () => {
       fetchMock.resolve({ url, init });
       return {
         ok: true,
-        json: async () => ({ ok: true }),
+        text: async () => (JSON.stringify({ ok: true })),
       };
     }) as typeof fetch,
   });
 
-  const _id = new Bson.ObjectId();
+  const _id = new ObjectId();
   client.database("db-name").collection("c-name").insertOne({
     _id,
     foo: "bar",
@@ -33,7 +33,7 @@ Deno.test("Sample Test", async () => {
   assertEquals(init.method, "POST");
   assertEquals(
     new Headers(init.headers).get("Content-Type"),
-    "application/json",
+    "application/ejson",
   );
   assertEquals(new Headers(init.headers).get("api-key"), "API_KEY");
   assertEquals(

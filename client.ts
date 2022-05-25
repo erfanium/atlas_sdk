@@ -1,4 +1,4 @@
-import { Bson } from "./deps.ts";
+import { Document, EJSON } from "./deps.ts";
 
 export interface MongoClientConstructorOptions {
   appId: string;
@@ -45,7 +45,7 @@ class Database {
     this.client = client;
   }
 
-  collection<T = Bson.Document>(name: string) {
+  collection<T = Document>(name: string) {
     return new Collection<T>(name, this);
   }
 }
@@ -70,8 +70,8 @@ class Collection<T> {
   }
 
   async findOne(
-    filter: Bson.Document,
-    { projection }: { projection?: Bson.Document } = {},
+    filter: Document,
+    { projection }: { projection?: Document } = {},
   ): Promise<T> {
     const result = await this.callApi("findOne", {
       filter,
@@ -81,10 +81,10 @@ class Collection<T> {
   }
 
   async find(
-    filter?: Bson.Document,
+    filter?: Document,
     { projection, sort, limit, skip }: {
-      projection?: Bson.Document;
-      sort?: Bson.Document;
+      projection?: Document;
+      sort?: Document;
       limit?: number;
       skip?: number;
     } = {},
@@ -100,8 +100,8 @@ class Collection<T> {
   }
 
   updateOne(
-    filter: Bson.Document,
-    update: Bson.Document,
+    filter: Document,
+    update: Document,
     { upsert }: { upsert?: boolean },
   ): Promise<
     { matchedCount: number; modifiedCount: number; upsertedId?: string }
@@ -114,8 +114,8 @@ class Collection<T> {
   }
 
   updateMany(
-    filter: Bson.Document,
-    update: Bson.Document,
+    filter: Document,
+    update: Document,
     { upsert }: { upsert?: boolean },
   ): Promise<
     { matchedCount: number; modifiedCount: number; upsertedId?: string }
@@ -128,8 +128,8 @@ class Collection<T> {
   }
 
   replaceOne(
-    filter: Bson.Document,
-    replacement: Bson.Document,
+    filter: Document,
+    replacement: Document,
     { upsert }: { upsert?: boolean },
   ): Promise<
     { matchedCount: number; modifiedCount: number; upsertedId?: string }
@@ -141,24 +141,24 @@ class Collection<T> {
     });
   }
 
-  deleteOne(filter: Bson.Document): Promise<{ deletedCount: number }> {
+  deleteOne(filter: Document): Promise<{ deletedCount: number }> {
     return this.callApi("deleteOne", { filter });
   }
 
-  deleteMany(filter: Bson.Document): Promise<{ deletedCount: number }> {
+  deleteMany(filter: Document): Promise<{ deletedCount: number }> {
     return this.callApi("deleteMany", { filter });
   }
 
-  async aggregate<T = Bson.Document>(pipeline: Bson.Document[]): Promise<T[]> {
+  async aggregate<T = Document>(pipeline: Document[]): Promise<T[]> {
     const result = await this.callApi("aggregate", { pipeline });
     return result.documents;
   }
 
   async countDocuments(
-    filter?: Bson.Document,
+    filter?: Document,
     options?: { limit?: number; skip?: number },
   ): Promise<number> {
-    const pipeline: Bson.Document[] = [];
+    const pipeline: Document[] = [];
     if (filter) {
       pipeline.push({ $match: filter });
     }
@@ -189,17 +189,19 @@ class Collection<T> {
     return 0;
   }
 
-  async callApi(method: string, extra: Bson.Document) {
+  // deno-lint-ignore no-explicit-any
+  async callApi(method: string, extra: Document): Promise<any> {
     const { endpoint, appId, apiKey, dataSource } = this.client;
     const url = `${endpoint}/app/${appId}/endpoint/data/beta/action/${method}`;
 
     const response = await this.client.fetch(url, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/ejson",
+        "Accept": "application/ejson",
         "api-key": apiKey,
       },
-      body: Bson.EJSON.stringify({
+      body: EJSON.stringify({
         collection: this.name,
         database: this.database.name,
         dataSource: dataSource,
@@ -207,10 +209,12 @@ class Collection<T> {
       }),
     });
 
-    if (response.ok) {
-      return response.json();
+    const body = await response.text();
+
+    if (!response.ok) {
+      throw new Error(`${response.statusText}: ${body}`);
     }
 
-    throw new Error(`${response.statusText}: ${await response.text()}`);
+    return EJSON.parse(body);
   }
 }
