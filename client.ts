@@ -1,34 +1,49 @@
+import { AuthOptions } from "./auth_types.d.ts";
 import { Document, EJSON } from "./deps.ts";
 
 export interface MongoClientConstructorOptions {
-  appId: string;
   dataSource: string;
-  apiKey: string;
-  endpoint?: string;
+  auth: AuthOptions;
+  endpoint: string;
   fetch?: typeof fetch;
 }
 
 export class MongoClient {
-  appId: string;
   dataSource: string;
-  apiKey: string;
-  endpoint = "https://data.mongodb-api.com";
+  endpoint: string;
   fetch = fetch;
+  headers = new Headers();
 
   constructor(
-    { appId, dataSource, apiKey, endpoint, fetch }:
-      MongoClientConstructorOptions,
+    { dataSource, auth, endpoint, fetch }: MongoClientConstructorOptions,
   ) {
-    this.appId = appId;
     this.dataSource = dataSource;
-    this.apiKey = apiKey;
-    if (endpoint) {
-      this.endpoint = endpoint;
-    }
+    this.endpoint = endpoint;
 
     if (fetch) {
       this.fetch = fetch;
     }
+
+    this.headers.set("Content-Type", "application/ejson");
+    this.headers.set("Accept", "application/ejson");
+
+    if ("apiKey" in auth) {
+      this.headers.set("api-key", auth.apiKey);
+      return;
+    }
+
+    if ("jwtTokenString" in auth) {
+      this.headers.set("jwtTokenString", auth.jwtTokenString);
+      return;
+    }
+
+    if ("email" in auth && "password" in auth) {
+      this.headers.set("email", auth.email);
+      this.headers.set("password", auth.password);
+      return;
+    }
+
+    throw new Error("Invalid auth options");
   }
 
   database(name: string) {
@@ -191,16 +206,12 @@ class Collection<T> {
 
   // deno-lint-ignore no-explicit-any
   async callApi(method: string, extra: Document): Promise<any> {
-    const { endpoint, appId, apiKey, dataSource } = this.client;
-    const url = `${endpoint}/app/${appId}/endpoint/data/v1/action/${method}`;
+    const { endpoint, dataSource, headers } = this.client;
+    const url = `${endpoint}/action/${method}`;
 
     const response = await this.client.fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/ejson",
-        "Accept": "application/ejson",
-        "api-key": apiKey,
-      },
+      headers,
       body: EJSON.stringify({
         collection: this.name,
         database: this.database.name,

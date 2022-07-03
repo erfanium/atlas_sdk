@@ -1,15 +1,17 @@
 // deno-lint-ignore-file require-await
 import { MongoClient, ObjectId } from "./mod.ts";
-import { deferred } from "https://deno.land/std@0.140.0/async/deferred.ts";
-import { assertEquals } from "https://deno.land/std@0.140.0/testing/asserts.ts";
+import { deferred } from "https://deno.land/std@0.146.0/async/deferred.ts";
+import { assertEquals } from "https://deno.land/std@0.146.0/testing/asserts.ts";
 
 Deno.test("Sample Test", async () => {
   const fetchMock = deferred<{ url: string; init: RequestInit }>();
 
   const client = new MongoClient({
-    appId: "appId",
+    endpoint: "https://data.mongodb-api.com/app/data-abc/endpoint/data/v1",
     dataSource: "dataSource",
-    apiKey: "API_KEY",
+    auth: {
+      apiKey: "API_KEY",
+    },
     fetch: (async (url: string, init: RequestInit) => {
       fetchMock.resolve({ url, init });
       return {
@@ -28,7 +30,7 @@ Deno.test("Sample Test", async () => {
   const { url, init } = await fetchMock;
   assertEquals(
     url,
-    "https://data.mongodb-api.com/app/appId/endpoint/data/beta/action/insertOne",
+    "https://data.mongodb-api.com/app/data-abc/endpoint/data/v1/action/insertOne",
   );
   assertEquals(init.method, "POST");
   assertEquals(
