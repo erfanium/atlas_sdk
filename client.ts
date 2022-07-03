@@ -1,4 +1,4 @@
-import { AuthOptions } from "./auth_types.d.ts";
+import type { AuthOptions } from "./auth_types.d.ts";
 import { Document, EJSON } from "./deps.ts";
 
 export interface MongoClientConstructorOptions {
