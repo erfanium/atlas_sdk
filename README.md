@@ -6,6 +6,16 @@
 
 [![Discord server](https://img.shields.io/discord/768918486575480863?color=blue&label=Ask%20for%20help%20here&logo=discord&style=flat-square)](https://discord.gg/HEdTCvZUSf)
 
+## Why
+
+- [x/mongo](https://github.com/denodrivers/deno_mongo) is not production ready
+  and reliable, but this module is
+- It's serverless friendly. because atlas data api uses `https` protocol,
+  there's no need to wait for MongoClient to be connected. this will reduce cold
+  start time.
+- Can be used on Web and Node.js v17+ environments, because this module only
+  depends on `fetch`
+
 ## Links
 
 - [Docs](https://doc.deno.land/https/deno.land/x/atlas_sdk/mod.ts)
