@@ -192,7 +192,7 @@ class Collection<T> {
   // deno-lint-ignore no-explicit-any
   async callApi(method: string, extra: Document): Promise<any> {
     const { endpoint, appId, apiKey, dataSource } = this.client;
-    const url = `${endpoint}/app/${appId}/endpoint/data/beta/action/${method}`;
+    const url = `${endpoint}/app/${appId}/endpoint/data/v1/action/${method}`;
 
     const response = await this.client.fetch(url, {
       method: "POST",
