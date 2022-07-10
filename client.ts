@@ -15,13 +15,14 @@ export class MongoClient {
   headers = new Headers();
 
   constructor(
-    { dataSource, auth, endpoint, fetch }: MongoClientConstructorOptions,
+    { dataSource, auth, endpoint, fetch: customFetch }:
+      MongoClientConstructorOptions,
   ) {
     this.dataSource = dataSource;
     this.endpoint = endpoint;
 
-    if (fetch) {
-      this.fetch = fetch;
+    if (customFetch) {
+      this.fetch = customFetch;
     }
 
     this.headers.set("Content-Type", "application/ejson");
@@ -179,7 +180,7 @@ class Collection<T> {
     }
 
     if (typeof options?.skip === "number") {
-      pipeline.push({ $skip: options.limit });
+      pipeline.push({ $skip: options.skip });
     }
 
     if (typeof options?.limit === "number") {
