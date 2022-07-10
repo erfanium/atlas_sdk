@@ -1,0 +1,34 @@
+name: ci
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: ubuntu-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Setup Environment
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Clone repository
+        uses: actions/checkout@v2
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: 1.x.x
+
+      - name: Log versions
+        run: |
+          deno --version
+      # Lint & Format
+      - name: Lint & Format TS
+        run: |
+          deno lint
+          deno fmt --check
+      # Tests
+      - name: Test TS
+        run: deno test

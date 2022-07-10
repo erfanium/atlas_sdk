@@ -1,7 +1,6 @@
 // deno-lint-ignore-file require-await
 import { MongoClient, ObjectId } from "./mod.ts";
-import { deferred } from "https://deno.land/std@0.146.0/async/deferred.ts";
-import { assertEquals } from "https://deno.land/std@0.146.0/testing/asserts.ts";
+import { assertEquals, deferred } from "./test_deps.ts";
 
 Deno.test("Sample Test", async () => {
   const fetchMock = deferred<{ url: string; init: RequestInit }>();
