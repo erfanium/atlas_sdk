@@ -52,7 +52,7 @@ export class MongoClient {
   }
 }
 
-class Database {
+export class Database {
   name: string;
   client: MongoClient;
 
@@ -66,7 +66,7 @@ class Database {
   }
 }
 
-class Collection<T> {
+export class Collection<T> {
   name: string;
   database: Database;
   client: MongoClient;
