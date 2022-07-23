@@ -118,7 +118,7 @@ export class Collection<T> {
   updateOne(
     filter: Document,
     update: Document,
-    upsert = false,
+    { upsert }: { upsert?: boolean } = {},
   ): Promise<
     { matchedCount: number; modifiedCount: number; upsertedId?: string }
   > {
@@ -132,7 +132,7 @@ export class Collection<T> {
   updateMany(
     filter: Document,
     update: Document,
-    upsert = false,
+    { upsert }: { upsert?: boolean } = {},
   ): Promise<
     { matchedCount: number; modifiedCount: number; upsertedId?: string }
   > {
@@ -146,7 +146,7 @@ export class Collection<T> {
   replaceOne(
     filter: Document,
     replacement: Document,
-    upsert = false,
+    { upsert }: { upsert?: boolean } = {},
   ): Promise<
     { matchedCount: number; modifiedCount: number; upsertedId?: string }
   > {
