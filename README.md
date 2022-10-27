@@ -100,6 +100,7 @@ const users = db.collection<UserSchema>("users");
 
 ```ts
 const insertId = await users.insertOne({
+  _id: new ObjectId(),
   username: "user1",
   password: "pass1",
 });
@@ -109,9 +110,11 @@ const insertId = await users.insertOne({
 
 ```ts
 const insertIds = await users.insertMany([{
+  _id: new ObjectId(),
   username: "user1",
   password: "pass1",
 }, {
+  _id: new ObjectId(),
   username: "user2",
   password: "pass2",
 }]);
