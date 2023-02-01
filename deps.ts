@@ -1,1 +1,1 @@
-export * from "https://deno.land/x/web_bson@v0.2.5/mod.ts";
+export * from "https://deno.land/x/web_bson@v0.3.0/mod.js";
