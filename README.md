@@ -148,8 +148,8 @@ const count = await users.countDocuments({ active: true });
 #### estimatedDocumentCount
 
 ```ts
-// estimated count of all active users
-const estimatedCount = await users.estimatedDocumentCount({ active: true });
+// estimated count of all users
+const estimatedCount = await users.estimatedDocumentCount();
 ```
 
 ### Aggregation
