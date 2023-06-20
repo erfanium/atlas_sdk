@@ -2,7 +2,7 @@
 import { MongoClient, ObjectId, UUID } from "./mod.ts";
 import { assertEquals, deferred } from "./test_deps.ts";
 
-Deno.test("Sample Test", async () => {
+Deno.test("Sample Test EJSON", async () => {
   const fetchMock = deferred<{ url: string; init: RequestInit }>();
 
   const client = new MongoClient({
@@ -59,3 +59,57 @@ Deno.test("Sample Test", async () => {
     },
   });
 });
+
+Deno.test("Sample Test JSON", async () => {
+  const fetchMock = deferred<{ url: string; init: RequestInit }>();
+
+  const client = new MongoClient({
+    endpoint: "https://data.mongodb-api.com/app/data-abc/endpoint/data/v1",
+    dataSource: "dataSource",
+    auth: {
+      apiKey: "API_KEY",
+    },    
+    fetch: (async (url: string, init: RequestInit) => {
+      fetchMock.resolve({ url, init });
+      return {
+        ok: true,
+        text: async () => JSON.stringify({ ok: true }),
+      };
+    }) as typeof fetch,
+    encoding: 'JSON',
+  });
+
+  const _id = new ObjectId();
+  client
+    .database("db-name")
+    .collection("c-name")
+    .insertOne({
+      _id,
+      foo: "bar",
+      uuid: new UUID("408ebbdc-2651-4aa4-8298-3aef14e78f7e"),
+    });
+
+  const { url, init } = await fetchMock;
+  assertEquals(
+    url,
+    "https://data.mongodb-api.com/app/data-abc/endpoint/data/v1/action/insertOne",
+  );
+  assertEquals(init.method, "POST");
+  assertEquals(
+    new Headers(init.headers).get("Content-Type"),
+    "application/json",
+  );
+  assertEquals(new Headers(init.headers).get("api-key"), "API_KEY");
+  assertEquals(await new Request(url, init).json(), {
+    collection: "c-name",
+    database: "db-name",
+    dataSource: "dataSource",
+    document: {
+      _id: _id.toHexString(),
+      foo: "bar",
+      uuid: "408ebbdc-2651-4aa4-8298-3aef14e78f7e",
+    },
+  });
+});
+
+

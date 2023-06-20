@@ -6,6 +6,7 @@ export interface MongoClientConstructorOptions {
   auth: AuthOptions;
   endpoint: string;
   fetch?: typeof fetch;
+  encoding?: 'JSON' | 'EJSON'
 }
 
 export class MongoClient {
@@ -13,9 +14,11 @@ export class MongoClient {
   endpoint: string;
   fetch = fetch;
   headers = new Headers();
-
+  // deno-lint-ignore no-explicit-any
+  stringify: (value: any) => string;
+ 
   constructor(
-    { dataSource, auth, endpoint, fetch: customFetch }:
+    { dataSource, auth, endpoint, fetch: customFetch, encoding: customEncoding }:
       MongoClientConstructorOptions,
   ) {
     this.dataSource = dataSource;
@@ -24,9 +27,15 @@ export class MongoClient {
     if (customFetch) {
       this.fetch = customFetch;
     }
-
-    this.headers.set("Content-Type", "application/ejson");
-    this.headers.set("Accept", "application/ejson");
+    if (customEncoding && customEncoding === 'JSON') {
+      this.stringify = JSON.stringify;
+      this.headers.set("Content-Type", "application/json");
+      this.headers.set("Accept", "application/json");
+    } else {
+      this.stringify = EJSON.stringify;
+      this.headers.set("Content-Type", "application/ejson");
+      this.headers.set("Accept", "application/ejson");  
+    }
 
     if ("apiKey" in auth) {
       this.headers.set("api-key", auth.apiKey);
@@ -213,7 +222,7 @@ export class Collection<T> {
     const response = await this.client.fetch(url, {
       method: "POST",
       headers,
-      body: EJSON.stringify({
+      body: this.client.stringify({
         collection: this.name,
         database: this.database.name,
         dataSource: dataSource,
