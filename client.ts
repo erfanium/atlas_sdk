@@ -6,7 +6,7 @@ export interface MongoClientConstructorOptions {
   auth: AuthOptions;
   endpoint: string;
   fetch?: typeof fetch;
-  encoding?: 'JSON' | 'EJSON'
+  contentType?: "json" | "ejson";
 }
 
 export class MongoClient {
@@ -16,10 +16,15 @@ export class MongoClient {
   headers = new Headers();
   // deno-lint-ignore no-explicit-any
   stringify: (value: any) => string;
- 
+
   constructor(
-    { dataSource, auth, endpoint, fetch: customFetch, encoding: customEncoding }:
-      MongoClientConstructorOptions,
+    {
+      dataSource,
+      auth,
+      endpoint,
+      fetch: customFetch,
+      contentType: customcontentType,
+    }: MongoClientConstructorOptions,
   ) {
     this.dataSource = dataSource;
     this.endpoint = endpoint;
@@ -27,14 +32,14 @@ export class MongoClient {
     if (customFetch) {
       this.fetch = customFetch;
     }
-    if (customEncoding && customEncoding === 'JSON') {
+    if (customcontentType && customcontentType === "json") {
       this.stringify = JSON.stringify;
       this.headers.set("Content-Type", "application/json");
       this.headers.set("Accept", "application/json");
     } else {
       this.stringify = EJSON.stringify;
       this.headers.set("Content-Type", "application/ejson");
-      this.headers.set("Accept", "application/ejson");  
+      this.headers.set("Accept", "application/ejson");
     }
 
     if ("apiKey" in auth) {
@@ -218,24 +223,25 @@ export class Collection<T> {
   async callApi(method: string, extra: Document): Promise<any> {
     const { endpoint, dataSource, headers } = this.client;
     const url = `${endpoint}/action/${method}`;
+    const body = this.client.stringify({
+      collection: this.name,
+      database: this.database.name,
+      dataSource: dataSource,
+      ...extra,
+    });
 
     const response = await this.client.fetch(url, {
       method: "POST",
       headers,
-      body: this.client.stringify({
-        collection: this.name,
-        database: this.database.name,
-        dataSource: dataSource,
-        ...extra,
-      }),
+      body,
     });
 
-    const body = await response.text();
+    const responseText = await response.text();
 
     if (!response.ok) {
-      throw new Error(`${response.statusText}: ${body}`);
+      throw new Error(`${response.statusText}: ${responseText}`);
     }
 
-    return EJSON.parse(body);
+    return EJSON.parse(responseText);
   }
 }

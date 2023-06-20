@@ -68,7 +68,7 @@ Deno.test("Sample Test JSON", async () => {
     dataSource: "dataSource",
     auth: {
       apiKey: "API_KEY",
-    },    
+    },
     fetch: (async (url: string, init: RequestInit) => {
       fetchMock.resolve({ url, init });
       return {
@@ -76,7 +76,7 @@ Deno.test("Sample Test JSON", async () => {
         text: async () => JSON.stringify({ ok: true }),
       };
     }) as typeof fetch,
-    encoding: 'JSON',
+    contentType: "json",
   });
 
   const _id = new ObjectId();
@@ -111,5 +111,3 @@ Deno.test("Sample Test JSON", async () => {
     },
   });
 });
-
-
