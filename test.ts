@@ -33,12 +33,12 @@ Deno.test("Sample Test", async () => {
   const { url, init } = await fetchMock.promise;
   assertEquals(
     url,
-    "https://data.mongodb-api.com/app/data-abc/endpoint/data/v1/action/insertOne"
+    "https://data.mongodb-api.com/app/data-abc/endpoint/data/v1/action/insertOne",
   );
   assertEquals(init.method, "POST");
   assertEquals(
     new Headers(init.headers).get("Content-Type"),
-    "application/ejson"
+    "application/ejson",
   );
   assertEquals(new Headers(init.headers).get("api-key"), "API_KEY");
   assertEquals(await new Request(url, init).json(), {
